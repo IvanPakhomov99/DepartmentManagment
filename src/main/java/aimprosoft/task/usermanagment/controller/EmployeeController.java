@@ -18,7 +18,7 @@ import java.text.ParseException;
 import java.util.List;
 
 
-// TODO: сделать корректное добавление, обновление(исправить дату), удаление, чтобы формы отображались правильно(js)+отредактировать js0
+// TODO: обновление(исправить дату)
 // TODO: красиво оформить всё
 // TODO: добавить Валидацию данных
 // TODO: Проверить все Exceptions, создать своё
@@ -71,11 +71,7 @@ public class EmployeeController extends HttpServlet {
     private void listEmployee(HttpServletRequest req, HttpServletResponse resp) throws SQLException, ServletException, IOException {
         String depName = req.getParameter("depName");
         List<Employee> employeeList;
-        if (depName != null) {
-            employeeList = (List<Employee>) employeeDao.findByDepId(depName);
-        } else {
-            employeeList = (List<Employee>) employeeDao.findAll();
-        }
+        employeeList = (List<Employee>) employeeDao.findByDepId(depName);
         req.setAttribute("depName", depName);
         req.setAttribute("employeeList", employeeList);
         RequestDispatcher requestDispatcher = req.getRequestDispatcher("/WEB-INF/JSP/EmployeeList.jsp");
@@ -131,7 +127,7 @@ public class EmployeeController extends HttpServlet {
         String email = req.getParameter("email");
         Date birthday = Date.valueOf(req.getParameter("birthday"));
         int salary = Integer.parseInt(req.getParameter("salary"));
-        String depName = req.getParameter("depName");
+        String depName = req.getParameter("departmentName");
         Employee employee = new Employee();
         employee.setFirstName(firstName);
         employee.setLastName(lastName);

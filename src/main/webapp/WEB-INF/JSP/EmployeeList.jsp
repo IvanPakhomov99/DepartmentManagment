@@ -4,74 +4,98 @@
 
 <script src="http://code.jquery.com/jquery-latest.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-<script type="text/javascript">
-    $(document).ready(function () {
-        $('#updateButton').click(function (e) {
-            e.preventDefault();
-            var id = $("#id").val();
-            var firstName = $("#firstName").val();
-            var lastName = $("#lastName").val();
-            var email = $("#email").val();
-            var birthday = $("#birthday").val();
-            var salary = $("#salary").val();
-            var departmentName = $("#departmentName").val();
-            $.ajax({
-                url: "/employee/update",
-                type: "post",
-                data: {
-                    id: id,
-                    firstName: firstName,
-                    lastName: lastName,
-                    email: email,
-                    birthday: birthday,
-                    salary: salary,
-                    departmentName: departmentName
-                },
-                cache: false,
-                success: function (data) {
-                    $("#refresh").html(data);
-                }
-            });
-        });
-    });
-</script>
 <script>
-    function insertForm() {
 
+    function showAddTable() {
+        document.getElementById('actionForm').reset();
+        document.getElementById('actionForm').action = "employee/insert";
+        document.getElementById('confirmAddingButton').style.visibility = "visible";
+        document.getElementById('confirmUpdateButton').style.visibility = "hidden";
+        document.getElementById('actionForm').style.visibility = "visible";
+        document.getElementById('departmentField').style.visibility = "hidden";
     }
-
-    function updateForm(id) {
-        $.get("/employee/update?id=" + id,
-            {
-                firstName: 'firstName',
-                lastName: 'lastName',
-                email: 'email',
-                birthday: 'birthday',
-                departmentName: 'departmentName',
-                salary: 'salary',
-
-            }
-        );
-    }
-
-    /*  function showAddTable() {
-          document.getElementById('insertForm').style.visibility = "visible";
-      }*/
 
     function showEditTable(id) {
-        console.log(id);
-        document.getElementById('updateForm').style.visibility = "visible";
+        document.getElementById('actionForm').action = "employee/update";
+        document.getElementById('confirmAddingButton').style.visibility = "hidden";
+        document.getElementById('confirmUpdateButton').style.visibility = "visible";
+        document.getElementById('departmentField').style.visibility = "visible";
+        document.getElementById('actionForm').style.visibility = "visible";
         populateEditForm(id);
     }
 
     function hideTable() {
         /*document.getElementById('insertForm').style.visibility = "hidden";*/
-        document.getElementById('updateForm').style.visibility = "hidden";
+        document.getElementById('actionForm').style.visibility = "hidden";
+    }
+    function employeeAddButton() {
+        var id = $("#id").val();
+        var firstName = $("#firstName").val();
+        var lastName = $("#lastName").val();
+        var email = $("#email").val();
+        var birthday = $("#birthday").val();
+        console.log(birthday)
+        var salary = $("#salary").val();
+        var departmentName = "${depName}";
+        console.log(departmentName);
+        $.ajax({
+            url: "/employee/insert",
+            type: "post",
+            data: {
+                id: id,
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                birthday: birthday,
+                salary: salary,
+                departmentName: departmentName
+            },
+            cache: false,
+            success: function (data) {
+                location.reload()
+            }
+        });
+    }
+    function employeeUpdateButton() {
+        var id = $("#id").val();
+        var firstName = $("#firstName").val();
+        var lastName = $("#lastName").val();
+        var email = $("#email").val();
+        var birthday = $("#birthday").val();
+        var salary = $("#salary").val();
+        var departmentName = $("#departmentName").val();
+        $.ajax({
+            url: "/employee/update",
+            type: "post",
+            data: {
+                id: id,
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                birthday: birthday,
+                salary: salary,
+                departmentName: departmentName
+            },
+            cache: false,
+            success: function (data) {
+                location.reload()
+            }
+        });
+    }
+
+    function deleteEmployee(id) {
+        var reqURL = "employee/delete?id=" + id;
+        $.get(reqURL);
+        location.reload();
     }
 
     function populateEditForm(id) {
         var reqURL = "employee/edit?id=" + id;
         $.get(reqURL, function (data) {
+            var dateString = data.birthday;
+            var d = new Date(dateString);
+            var result = d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate();
+            console.log(result);
             document.getElementById('id').value = data.id;
             document.getElementById('firstName').value = data.firstName;
             document.getElementById('lastName').value = data.lastName;
@@ -81,28 +105,22 @@
             document.getElementById('departmentName').value = data.depName;
         });
     }
-
-    function deleteEmployee(id) {
-        var reqURL = "employee/delete?id=" + id;
-        $.get(reqURL);
-        location.reload();
-    }
 </script>
 
 <html>
 <head>
     <title>Employee Web Application</title>
 </head>
-<body onload="javascript:hideTable()">
+<body onload="hideTable()">
 <div style="text-align: center;">
     <h1>EMPLOYEE</h1>
-    <%-- <h2>
-         <input type='button' onClick='javascript:showAddTable();' value='Add'>
-         <a href="../department">List All Departments</a>
-     </h2>--%>
+    <h2>
+        <input type='button' onClick='showAddTable();' value='Add'>
+        <%--<a href="../department">List All Departments</a>--%>
+    </h2>
 </div>
 <div align="center">
-    <table id="employeeTable" name="employeeTable" border="1" cellpadding="5">
+    <table id="employeeTable" border="1" cellpadding="5">
         <caption><h2>List of Employee</h2></caption>
         <tr>
             <th>ID</th>
@@ -125,22 +143,19 @@
                 <td>
                     <c:if test="${depName != null}">
                         <input type='button' data-employeeId='${employee.id}'
-                               onClick='javascript:showEditTable(${employee.id});' value='Edit'>
-                        <input type='button' onClick='javascript:deleteEmployee(${(employee.id)})' value='Delete'>
+                               onClick='showEditTable(${employee.id});' value='Edit'>
+                        <input type='button' onClick='deleteEmployee(${(employee.id)})' value='Delete'>
                     </c:if>
                 </td>
             </tr>
         </c:forEach>
     </table>
 </div>
+
+
 <div>
     <div align="center">
-        <form id="updateForm"
-              name="updateForm"
-              action="employee/update">
-            <%-- <form id="insertForm"
-                   onSubmit="return insertForm()"
-                   method="post">--%>
+        <form id="actionForm" method="post">
             <table border="1" cellpadding="4">
                 <caption>
                     <h2 id="editHeader">
@@ -155,7 +170,7 @@
                 </c:if>--%>
                 <tr hidden>
                     <td>
-                        <input type="text" id="id" name="id" size="45"/>
+                        <input type="text" id="id" name="id" size="45">
                     </td>
                 </tr>
                 <tr>
@@ -188,7 +203,7 @@
                         <input type="text" id="salary" name="salary" size="45"/>
                     </td>
                 </tr>
-                <tr id="editAttribute">
+                <tr id="departmentField">
                     <th>Department:</th>
                     <td>
                         <input type="text" id="departmentName" name="departmentName" size="45"/>
@@ -196,11 +211,15 @@
                 </tr>
                 <tr>
                     <td colspan="2" align="center">
-                        <input type="button" id="updateButton" value="Save"/>
+                        <input type="button" name="confirmAddingButton" onclick="employeeAddButton()" id="confirmAddingButton" value="Add"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" align="center">
+                        <input type="button" id="confirmUpdateButton" name="confirmUpdateButton" onclick="employeeUpdateButton()" value="Edit"/>
                     </td>
                 </tr>
             </table>
-            <%--</form>--%>
         </form>
     </div>
 </div>

@@ -1,8 +1,6 @@
 package aimprosoft.task.usermanagment.repository.impl;
 
 import aimprosoft.task.usermanagment.configuration.ConnectionFactory;
-import aimprosoft.task.usermanagment.configuration.DaoFactory;
-import aimprosoft.task.usermanagment.entity.Department;
 import aimprosoft.task.usermanagment.entity.Employee;
 import aimprosoft.task.usermanagment.exception.DataBaseException;
 import aimprosoft.task.usermanagment.repository.EmployeeDao;
@@ -164,7 +162,7 @@ public class EmployeeDaoImpl implements EmployeeDao {
     }
 
     @Override
-    public Collection<Employee> findByDepId(String depName) throws SQLException{
+    public Collection<Employee> findByDepId(String depName) throws SQLException {
         Collection<Employee> result = new LinkedList<>();
         try {
             Connection connection = connectionFactory.createConnection();
