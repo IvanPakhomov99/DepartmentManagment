@@ -1,112 +1,9 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
+<%@ page contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-
-<script src="http://code.jquery.com/jquery-latest.min.js"></script>
-<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-<script>
-
-    function showAddTable() {
-        document.getElementById('actionForm').reset();
-        document.getElementById('actionForm').action = "employee/insert";
-        document.getElementById('confirmAddingButton').style.visibility = "visible";
-        document.getElementById('confirmUpdateButton').style.visibility = "hidden";
-        document.getElementById('actionForm').style.visibility = "visible";
-        document.getElementById('departmentField').style.visibility = "hidden";
-    }
-
-    function showEditTable(id) {
-        document.getElementById('actionForm').action = "employee/update";
-        document.getElementById('confirmAddingButton').style.visibility = "hidden";
-        document.getElementById('confirmUpdateButton').style.visibility = "visible";
-        document.getElementById('departmentField').style.visibility = "visible";
-        document.getElementById('actionForm').style.visibility = "visible";
-        populateEditForm(id);
-    }
-
-    function hideTable() {
-        /*document.getElementById('insertForm').style.visibility = "hidden";*/
-        document.getElementById('actionForm').style.visibility = "hidden";
-    }
-    function employeeAddButton() {
-        var id = $("#id").val();
-        var firstName = $("#firstName").val();
-        var lastName = $("#lastName").val();
-        var email = $("#email").val();
-        var birthday = $("#birthday").val();
-        console.log(birthday)
-        var salary = $("#salary").val();
-        var departmentName = "${depName}";
-        console.log(departmentName);
-        $.ajax({
-            url: "/employee/insert",
-            type: "post",
-            data: {
-                id: id,
-                firstName: firstName,
-                lastName: lastName,
-                email: email,
-                birthday: birthday,
-                salary: salary,
-                departmentName: departmentName
-            },
-            cache: false,
-            success: function (data) {
-                location.reload()
-            }
-        });
-    }
-    function employeeUpdateButton() {
-        var id = $("#id").val();
-        var firstName = $("#firstName").val();
-        var lastName = $("#lastName").val();
-        var email = $("#email").val();
-        var birthday = $("#birthday").val();
-        var salary = $("#salary").val();
-        var departmentName = $("#departmentName").val();
-        $.ajax({
-            url: "/employee/update",
-            type: "post",
-            data: {
-                id: id,
-                firstName: firstName,
-                lastName: lastName,
-                email: email,
-                birthday: birthday,
-                salary: salary,
-                departmentName: departmentName
-            },
-            cache: false,
-            success: function (data) {
-                location.reload()
-            }
-        });
-    }
-
-    function deleteEmployee(id) {
-        var reqURL = "employee/delete?id=" + id;
-        $.get(reqURL);
-        location.reload();
-    }
-
-    function populateEditForm(id) {
-        var reqURL = "employee/edit?id=" + id;
-        $.get(reqURL, function (data) {
-            var dateString = data.birthday;
-            var d = new Date(dateString);
-            var result = d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate();
-            console.log(result);
-            document.getElementById('id').value = data.id;
-            document.getElementById('firstName').value = data.firstName;
-            document.getElementById('lastName').value = data.lastName;
-            document.getElementById('email').value = data.email;
-            document.getElementById('birthday').value = data.birthday;
-            document.getElementById('salary').value = data.salary;
-            document.getElementById('departmentName').value = data.depName;
-        });
-    }
-</script>
-
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt" %>
+<jsp:include page="section/css.jsp"/>
+<jsp:include page="section/js.jsp"/>
 <html>
 <head>
     <title>Employee Web Application</title>
@@ -115,25 +12,28 @@
 <div style="text-align: center;">
     <h1>EMPLOYEE</h1>
     <h2>
-        <input type='button' onClick='showAddTable();' value='Add'>
-        <%--<a href="../department">List All Departments</a>--%>
+        <p><a href="../department/list">List All Departments</a></p>
+        <p><input type='button' onClick='showAddTable();' value='Add'></p>
     </h2>
 </div>
-<div align="center">
-    <table id="employeeTable" border="1" cellpadding="5">
+<div class="col-md-4 col-md-offset-4">
+    <table align="center" class="table table-striped" id="employeeTable" border="1" cellpadding="5">
         <caption><h2>List of Employee</h2></caption>
+        <thead>
         <tr>
-            <th>ID</th>
-            <th>FirstName</th>
-            <th>LastName</th>
-            <th>Email</th>
-            <th>Birthday</th>
-            <th>Salary</th>
-            <th>Department</th>
+            <th scope="col">ID</th>
+            <th scope="col">FirstName</th>
+            <th scope="col">LastName</th>
+            <th scope="col">Email</th>
+            <th scope="col">Birthday</th>
+            <th scope="col">Salary</th>
+            <th scope="col">Department</th>
         </tr>
+        </thead>
+        <tbody>
         <c:forEach var="employee" items="${employeeList}">
             <tr>
-                <td><c:out value="${employee.id}"/></td>
+                <td scope="row"><c:out value="${employee.id}"/></td>
                 <td><c:out value="${employee.firstName}"/></td>
                 <td><c:out value="${employee.lastName}"/></td>
                 <td><c:out value="${employee.email}"/></td>
@@ -149,79 +49,58 @@
                 </td>
             </tr>
         </c:forEach>
+        </tbody>
     </table>
 </div>
 
 
-<div>
-    <div align="center">
-        <form id="actionForm" method="post">
-            <table border="1" cellpadding="4">
-                <caption>
-                    <h2 id="editHeader">
-                        Edit
-                    </h2>
-                    <h2 id=addHeader>
-                        Add new Employee in the ${depName} Department
-                    </h2>
-                </caption>
-                <%--<c:if test="${employee != null}">
-                    <input type="hidden" name="id" value="<c:out value='${employee.id}' />"/>
-                </c:if>--%>
-                <tr hidden>
-                    <td>
-                        <input type="text" id="id" name="id" size="45">
-                    </td>
-                </tr>
-                <tr>
-                    <th>First Name:</th>
-                    <td>
-                        <input type="text" id="firstName" name="firstName" size="45"/>
-                    </td>
-                </tr>
-                <tr>
-                    <th>Last Name:</th>
-                    <td>
-                        <input type="text" id="lastName" name="lastName" size="45"/>
-                    </td>
-                </tr>
-                <tr>
-                    <th>Email:</th>
-                    <td>
-                        <input type="text" id="email" name="email" size="45"/>
-                    </td>
-                </tr>
-                <tr>
-                    <th>Birthday:</th>
-                    <td>
-                        <input type="text" id="birthday" name="birthday" size="45"/>
-                    </td>
-                </tr>
-                <tr>
-                    <th>Salary:</th>
-                    <td>
-                        <input type="text" id="salary" name="salary" size="45"/>
-                    </td>
-                </tr>
-                <tr id="departmentField">
-                    <th>Department:</th>
-                    <td>
-                        <input type="text" id="departmentName" name="departmentName" size="45"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2" align="center">
-                        <input type="button" name="confirmAddingButton" onclick="employeeAddButton()" id="confirmAddingButton" value="Add"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2" align="center">
-                        <input type="button" id="confirmUpdateButton" name="confirmUpdateButton" onclick="employeeUpdateButton()" value="Edit"/>
-                    </td>
-                </tr>
-            </table>
-        </form>
-    </div>
+<div class="col-md-4 col-md-offset-4">
+    <h2 style="display: none" id="addHeader">
+        Add new employee in the ${depName} department
+    </h2>
+    <h2 style="display: none" id="editHeader">
+        Edit selected employee
+    </h2>
+    <form class="ws-validate" id="actionForm" method="post">
+        <div hidden class="form-group">
+            <label for="id">Id</label>
+            <input type="text" class="form-control" id="id">
+        </div>
+        <div class="form-group">
+            <label for="firstName">First Name</label>
+            <input type="text" class="form-control" id="firstName" pattern="[A-z]{2,20}" placeholder="Vania" size="20" required/>
+        </div>
+        <div class="form-group">
+            <label for="lastName">Last Name</label>
+            <input type="text" class="form-control" id="lastName" pattern="[A-z]{2,20}" placeholder="Pakhomov" size="20" required/>
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" class="form-control" id="email" size="45" placeholder="example@example.com" multiple required/>
+        </div>
+        <div class="form-group">
+            <label for="birthday">Birthday</label>
+            <input type="date" class="form-control" id="birthday" data-relmax="-18"/>
+        </div>
+        <div class="form-group">
+            <label for="salary">Salary</label>
+            <input type="number" class="form-control" id="salary" size="10"/>
+        </div>
+        <div id="departmentField" class="form-group">
+            <label for="departmentName">Department</label>
+            <select class="form-control" id="departmentName">
+                <c:forEach var="department" items="${departmentList}">
+                    <option>${department.name}</option>
+                </c:forEach>
+            </select>
+        </div>
+        <input class="btn btn-primary" type="submit" id="confirmAddingButton"
+               onclick="employeeAddButton()">
+
+        <input class="btn btn-primary" type="submit" id="confirmUpdateButton"
+               onclick="employeeUpdateButton()">
+
+    </form>
 </div>
 </body>
 </html>

@@ -1,17 +1,28 @@
 package aimprosoft.task.usermanagment.configuration;
 
-import aimprosoft.task.usermanagment.exception.DataBaseException;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 
 
 public interface ConnectionFactory {
-    Connection createConnection() throws DataBaseException, SQLException;
+    Connection createConnection() throws SQLException;
 
-    void closeQuietly(Connection connection) throws SQLException;
+    default void closeQuietly(Connection connection) throws SQLException {
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
-    void rollbackQuietly(Connection connection) throws SQLException;
+
+    default void rollbackQuietly(Connection connection) throws SQLException {
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
 
 }

@@ -1,13 +1,11 @@
 package aimprosoft.task.usermanagment.configuration;
 
-import aimprosoft.task.usermanagment.entity.Department;
 import aimprosoft.task.usermanagment.entity.Employee;
 import aimprosoft.task.usermanagment.repository.DepartmentDao;
 import aimprosoft.task.usermanagment.repository.EmployeeDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Date;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -47,7 +45,7 @@ public class DaoFactoryImpl extends DaoFactory {
         Collection<Employee> employee = new LinkedList<>();
         try {
             employee = DaoFactory.getInstance().getEmployeeDao().findByDepId("Education");
-            for(Employee result : employee) {
+            for (Employee result : employee) {
                 System.out.println(result.getFirstName() + "  " + result.getFirstName());
             }
         } catch (SQLException e) {

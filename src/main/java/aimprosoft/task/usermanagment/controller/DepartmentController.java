@@ -3,6 +3,7 @@ package aimprosoft.task.usermanagment.controller;
 import aimprosoft.task.usermanagment.configuration.DaoFactory;
 import aimprosoft.task.usermanagment.entity.Department;
 import aimprosoft.task.usermanagment.repository.DepartmentDao;
+import com.google.gson.Gson;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -17,10 +18,13 @@ import java.util.List;
 @WebServlet("/department/*")
 public class DepartmentController extends HttpServlet {
     private DepartmentDao departmentDao;
+    private Gson gson = new Gson();
+
     @Override
     public void init() throws ServletException {
         departmentDao = DaoFactory.getInstance().getDepartmentDao();
     }
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         doGet(req, resp);
@@ -51,13 +55,14 @@ public class DepartmentController extends HttpServlet {
                     break;
             }
         } catch (SQLException e) {
-
+            resp.sendRedirect("/WEB-INF/JSP/Error.jsp");
         }
     }
 
-    private void editDepartment(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+    private void editDepartment(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, SQLException {
         Long id = Long.parseLong(req.getParameter("id"));
-        Department department = new Department(id);
+        Department department = departmentDao.find(id);
         RequestDispatcher requestDispatcher = req.getRequestDispatcher("/WEB-INF/JSP/DepartmentForm.jsp");
         req.setAttribute("department", department);
         requestDispatcher.forward(req, resp);
@@ -69,7 +74,7 @@ public class DepartmentController extends HttpServlet {
         String city = req.getParameter("city");
         Department department = new Department(name, city, id);
         departmentDao.update(department);
-        resp.sendRedirect("list");
+        resp.sendRedirect("../department/list");
     }
 
     private void listDepartment(HttpServletRequest req, HttpServletResponse resp) throws SQLException, IOException, ServletException {
@@ -87,13 +92,13 @@ public class DepartmentController extends HttpServlet {
     private void insertDepartment(HttpServletRequest req, HttpServletResponse resp) throws SQLException, IOException {
         String name = req.getParameter("name");
         String city = req.getParameter("city");
-
         Department department = new Department(name, city);
         departmentDao.create(department);
         resp.sendRedirect("list");
     }
 
-    private void deleteDepartment(HttpServletRequest req, HttpServletResponse resp) throws IOException, SQLException {
+    private void deleteDepartment(HttpServletRequest req, HttpServletResponse resp) throws
+            IOException, SQLException {
         Long id = Long.parseLong(req.getParameter("id"));
         Department department = new Department(id);
         departmentDao.delete(department);

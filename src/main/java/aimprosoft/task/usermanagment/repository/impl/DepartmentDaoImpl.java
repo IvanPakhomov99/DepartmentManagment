@@ -2,7 +2,6 @@ package aimprosoft.task.usermanagment.repository.impl;
 
 import aimprosoft.task.usermanagment.configuration.ConnectionFactory;
 import aimprosoft.task.usermanagment.entity.Department;
-import aimprosoft.task.usermanagment.exception.DataBaseException;
 import aimprosoft.task.usermanagment.repository.DepartmentDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,8 +49,7 @@ public class DepartmentDaoImpl implements DepartmentDao {
             try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     department.setId(generatedKeys.getLong(1));
-                }
-                else {
+                } else {
                     throw new SQLException("Creating user failed, no ID obtained.");
                 }
             }
@@ -61,8 +59,9 @@ public class DepartmentDaoImpl implements DepartmentDao {
             preparedStatement.close();
             connection.close();
 
-        } catch (DataBaseException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
+            throw new SQLException();
         }
         return department;
     }
@@ -83,8 +82,9 @@ public class DepartmentDaoImpl implements DepartmentDao {
             }
             preparedStatement.close();
             connection.close();
-        } catch (DataBaseException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
+            throw new SQLException();
         }
     }
 
@@ -101,8 +101,9 @@ public class DepartmentDaoImpl implements DepartmentDao {
             }
             preparedStatement.close();
             connection.close();
-        } catch (DataBaseException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
+            throw new SQLException();
         }
     }
 
@@ -124,7 +125,7 @@ public class DepartmentDaoImpl implements DepartmentDao {
             connection.close();
             preparedStatement.close();
             return department;
-        } catch (DataBaseException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             throw new SQLException("Error: It's not able to get information from DB");
         }
@@ -141,7 +142,7 @@ public class DepartmentDaoImpl implements DepartmentDao {
             resultSet.close();
             connection.close();
             statement.close();
-        } catch (DataBaseException e) {
+        } catch (SQLException e) {
             throw new SQLException(e);
         }
         return result;
@@ -163,7 +164,7 @@ public class DepartmentDaoImpl implements DepartmentDao {
     }*/
 
     private void setDepartment(Collection<Department> result, ResultSet resultSet) throws SQLException {
-        while (resultSet.next()){
+        while (resultSet.next()) {
             Department department = new Department();
             department.setId(resultSet.getLong(1));
             department.setName(resultSet.getString(2));

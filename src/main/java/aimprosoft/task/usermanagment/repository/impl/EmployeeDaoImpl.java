@@ -2,7 +2,6 @@ package aimprosoft.task.usermanagment.repository.impl;
 
 import aimprosoft.task.usermanagment.configuration.ConnectionFactory;
 import aimprosoft.task.usermanagment.entity.Employee;
-import aimprosoft.task.usermanagment.exception.DataBaseException;
 import aimprosoft.task.usermanagment.repository.EmployeeDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,8 +54,9 @@ public class EmployeeDaoImpl implements EmployeeDao {
                     LOGGER.info("New employee was successful added to DB!");
                 }
             }
-        } catch (DataBaseException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
+            throw new SQLException();
         }
         return null;
     }
@@ -81,8 +81,9 @@ public class EmployeeDaoImpl implements EmployeeDao {
             connection.close();
             preparedStatement.close();
             departmentPreparedStatement.close();
-        } catch (DataBaseException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
+            throw new SQLException();
         }
     }
 
@@ -109,8 +110,9 @@ public class EmployeeDaoImpl implements EmployeeDao {
             }
             connection.close();
             preparedStatement.close();
-        } catch (DataBaseException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
+            throw new SQLException();
         }
     }
 
@@ -131,7 +133,7 @@ public class EmployeeDaoImpl implements EmployeeDao {
             preparedStatement.close();
             resultSet.close();
             return employee;
-        } catch (DataBaseException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             throw new SQLException("Error: It's not able to get information from DB");
         }
@@ -155,7 +157,7 @@ public class EmployeeDaoImpl implements EmployeeDao {
             connection.close();
             statement.close();
             resultSet.close();
-        } catch (DataBaseException e) {
+        } catch (SQLException e) {
             throw new SQLException(e);
         }
         return result;
@@ -178,7 +180,7 @@ public class EmployeeDaoImpl implements EmployeeDao {
             connection.close();
             preparedStatement.close();
             resultSet.close();
-        } catch (DataBaseException e) {
+        } catch (SQLException e) {
             throw new SQLException(e);
         }
         return result;

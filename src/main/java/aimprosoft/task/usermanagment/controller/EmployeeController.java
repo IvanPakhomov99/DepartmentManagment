@@ -1,7 +1,9 @@
 package aimprosoft.task.usermanagment.controller;
 
 import aimprosoft.task.usermanagment.configuration.DaoFactory;
+import aimprosoft.task.usermanagment.entity.Department;
 import aimprosoft.task.usermanagment.entity.Employee;
+import aimprosoft.task.usermanagment.repository.DepartmentDao;
 import aimprosoft.task.usermanagment.repository.EmployeeDao;
 import com.google.gson.Gson;
 
@@ -14,23 +16,23 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Date;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.util.List;
 
 
 // TODO: обновление(исправить дату)
-// TODO: красиво оформить всё
-// TODO: добавить Валидацию данных
+// TODO: добавить корректную Валидацию данных
 // TODO: Проверить все Exceptions, создать своё
-// TODO: Проверить весь проект, чтобы всё корректно работало и подумать как можно незначительно улучшить
+// TODO: Проверить весь проект, чтобы всё работало и подумать как можно незначительно улучшить
 @WebServlet("/employee/*")
 public class EmployeeController extends HttpServlet {
     private EmployeeDao employeeDao;
+    private DepartmentDao departmentDao;
     private Gson gson = new Gson();
 
     @Override
     public void init() throws ServletException {
         employeeDao = DaoFactory.getInstance().getEmployeeDao();
+        departmentDao = DaoFactory.getInstance().getDepartmentDao();
         super.init();
     }
 
@@ -63,32 +65,24 @@ public class EmployeeController extends HttpServlet {
                     listEmployee(req, resp);
                     break;
             }
-        } catch (ParseException | SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            resp.sendRedirect("/WEB-INF/JSP/Error.jsp");
         }
     }
 
     private void listEmployee(HttpServletRequest req, HttpServletResponse resp) throws SQLException, ServletException, IOException {
+        List<Department> departmentList = (List<Department>) departmentDao.findAll();
         String depName = req.getParameter("depName");
         List<Employee> employeeList;
         employeeList = (List<Employee>) employeeDao.findByDepId(depName);
         req.setAttribute("depName", depName);
         req.setAttribute("employeeList", employeeList);
+        req.setAttribute("departmentList", departmentList);
         RequestDispatcher requestDispatcher = req.getRequestDispatcher("/WEB-INF/JSP/EmployeeList.jsp");
         requestDispatcher.forward(req, resp);
     }
 
-    private void getEmployee(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, SQLException {
-        /*String depName = req.getParameter("depName");
-        Long id = Long.parseLong(req.getParameter("id"));
-        Employee employee = employeeDao.find(id);
-       // RequestDispatcher requestDispatcher = req.getRequestDispatcher("/WEB-INF/JSP/EmployeeForm.jsp");
-        req.setAttribute("employee", employee);
-        if (depName != null) {
-            req.setAttribute("depName", depName);
-        }
-        //requestDispatcher.forward(req, resp);
-        return employee;*/
+    private void getEmployee(HttpServletRequest req, HttpServletResponse resp) throws IOException, SQLException {
         Long id = Long.parseLong(req.getParameter("id"));
         Employee employee = employeeDao.find(id);
         String employeeJsonString = this.gson.toJson(employee);
@@ -98,7 +92,7 @@ public class EmployeeController extends HttpServlet {
         resp.getWriter().write(employeeJsonString);
     }
 
-    private void updateEmployeeForm(HttpServletRequest req, HttpServletResponse resp) throws ParseException, IOException, SQLException, ServletException {
+    private void updateEmployeeForm(HttpServletRequest req, HttpServletResponse resp) throws SQLException{
         Long id = Long.parseLong(req.getParameter("id"));
         String firstName = req.getParameter("firstName");
         String lastName = req.getParameter("lastName");
@@ -121,21 +115,23 @@ public class EmployeeController extends HttpServlet {
         listEmployee(req, resp);
     }
 
-    private void insertEmployee(HttpServletRequest req, HttpServletResponse resp) throws ParseException, SQLException, IOException, ServletException {
-        String firstName = req.getParameter("firstName");
-        String lastName = req.getParameter("lastName");
-        String email = req.getParameter("email");
-        Date birthday = Date.valueOf(req.getParameter("birthday"));
-        int salary = Integer.parseInt(req.getParameter("salary"));
-        String depName = req.getParameter("departmentName");
-        Employee employee = new Employee();
-        employee.setFirstName(firstName);
-        employee.setLastName(lastName);
-        employee.setBirthday(birthday);
-        employee.setEmail(email);
-        employee.setSalary(salary);
-        employee.setDepName(depName);
-        employeeDao.create(employee);
+    private void insertEmployee(HttpServletRequest req, HttpServletResponse resp) throws SQLException{
+
+            String firstName = req.getParameter("firstName");
+            String lastName = req.getParameter("lastName");
+            String email = req.getParameter("email");
+            Date birthday = Date.valueOf(req.getParameter("birthday"));
+            int salary = Integer.parseInt(req.getParameter("salary"));
+            String depName = req.getParameter("departmentName");
+            Employee employee = new Employee();
+            employee.setFirstName(firstName);
+            employee.setLastName(lastName);
+            employee.setBirthday(birthday);
+            employee.setEmail(email);
+            employee.setSalary(salary);
+            employee.setDepName(depName);
+            employeeDao.create(employee);
+
     }
 
     private void showNewEmployeeForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

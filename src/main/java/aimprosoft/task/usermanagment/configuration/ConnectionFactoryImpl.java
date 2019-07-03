@@ -1,12 +1,10 @@
 package aimprosoft.task.usermanagment.configuration;
 
-import aimprosoft.task.usermanagment.exception.DataBaseException;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
@@ -52,7 +50,7 @@ public class ConnectionFactoryImpl implements ConnectionFactory {
     }
 
     @Override
-    public Connection createConnection() throws DataBaseException, SQLException {
+    public Connection createConnection() throws SQLException {
         return dataSource.getConnection();
         /*try {
             Class.forName(driver);
@@ -64,23 +62,5 @@ public class ConnectionFactoryImpl implements ConnectionFactory {
         } catch (SQLException e) {
             throw new DataBaseException(e);
         }*/
-    }
-
-    @Override
-    public void closeQuietly(Connection connection) {
-        try {
-            connection.close();
-        } catch (SQLException e) {
-            LOGGER.error("Error: Connection wasn't close!", e);
-        }
-    }
-
-    @Override
-    public void rollbackQuietly(Connection connection) {
-        try {
-            connection.rollback();
-        } catch (SQLException e) {
-            LOGGER.error("Error: Failed to cancel!", e);
-        }
     }
 }

@@ -14,13 +14,13 @@ import java.util.Properties;
 public abstract class DaoFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(DaoFactory.class);
 
-    protected static final String EMPLOYEE_DAO = "dao.Employee";
-    protected static final String DEPARTMENT_DAO = "dao.Department";
-    protected static final String ROOT_PATH = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("application.properties"))
+    static final String EMPLOYEE_DAO = "dao.Employee";
+    static final String DEPARTMENT_DAO = "dao.Department";
+    private static final String ROOT_PATH = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("application.properties"))
             .getPath().replaceAll("%20", " ");
     final static String DAO_FACTORY = "dao.factory";
 
-    protected static Properties property;
+    static Properties property;
     private static DaoFactory instance;
 
     static {
@@ -82,7 +82,7 @@ public abstract class DaoFactory {
         return instance;
     }
 
-    protected ConnectionFactory getConnectionFactory() {
+    ConnectionFactory getConnectionFactory() {
         LOGGER.info("Creating ConnectionFactory...");
         return new ConnectionFactoryImpl(property);
     }
